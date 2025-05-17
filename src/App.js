@@ -1,11 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import Dashboard from './components/Dashboard';
-import Exercise from './components/Exercise';
-import Tutorial from './components/Tutorial';
-import Feedback from './components/Feedback';
-import exercisesData from './assets/data/exercises.json';
-import en from './assets/data/i18n/en.json';
-import es from './assets/data/i18n/es.json';
+const { useState, useEffect } = window.React;
 
 class ErrorBoundary extends React.Component {
   state = { hasError: false, error: null };
@@ -27,18 +20,18 @@ class ErrorBoundary extends React.Component {
 
 const App = () => {
   const [lang, setLang] = useState('en');
-  const [i18n, setI18n] = useState(en);
+  const [i18n, setI18n] = useState(window.en);
   const [currentView, setCurrentView] = useState('dashboard');
   const [currentExercise, setCurrentExercise] = useState(null);
   const [scores, setScores] = useState({});
   const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
-    setI18n(lang === 'en' ? en : es);
+    setI18n(lang === 'en' ? window.en : window.es);
   }, [lang]);
 
   const handleExerciseSelect = (exerciseId) => {
-    const exercise = exercisesData.find(ex => ex.id === exerciseId);
+    const exercise = window.exercisesData.find(ex => ex.id === exerciseId);
     if (exercise) {
       setCurrentExercise(exercise);
       setCurrentView('exercise');
@@ -46,7 +39,7 @@ const App = () => {
   };
 
   const handleSubmit = (exerciseId, userAnswers) => {
-    const exercise = exercisesData.find(ex => ex.id === exerciseId);
+    const exercise = window.exercisesData.find(ex => ex.id === exerciseId);
     let score = 0;
     exercise.questions.forEach((q, i) => {
       if (q.correctAnswer === userAnswers[i]) score += 100 / exercise.questions.length;
@@ -84,7 +77,7 @@ const App = () => {
         <main className="flex-1 p-8">
           {currentView === 'dashboard' && (
             <Dashboard
-              exercises={exercisesData}
+              exercises={window.exercisesData}
               scores={scores}
               onSelect={handleExerciseSelect}
               i18n={i18n}
@@ -113,5 +106,3 @@ const App = () => {
     </ErrorBoundary>
   );
 };
-
-export default App;
