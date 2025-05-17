@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Dashboard = ({ exercises, scores, onSelect, i18n }) => {
   return (
     <div>
@@ -24,5 +22,3 @@ const Dashboard = ({ exercises, scores, onSelect, i18n }) => {
     </div>
   );
 };
-
-export default Dashboard;
