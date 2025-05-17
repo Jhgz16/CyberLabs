@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cyberlab-v3';
+const CACHE_NAME = 'cyberlab-v4';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -12,7 +12,6 @@ const urlsToCache = [
   '/src/assets/data/exercises.json',
   '/src/assets/data/i18n/en.json',
   '/src/assets/data/i18n/es.json',
-  '/favicon.ico',
   '/manifest.json',
   'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css',
   'https://cdn.jsdelivr.net/npm/react@17.0.2/umd/react.development.js',
