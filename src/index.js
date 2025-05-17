@@ -55,7 +55,7 @@ try {
       const category = categories.find(c => c.id === categoryId);
       const question = category.questions[index];
       let score = 0;
-      if (answer === question.correctAnswer) score = 100;
+      if (answer.toLowerCase() === question.correctAnswer.toLowerCase()) score = 100;
       setScores(prev => ({ ...prev, [`${categoryId}-${index}`]: score }));
       setUserAnswer(answer);
       setShowFeedback(true);
@@ -115,7 +115,7 @@ try {
                     key: i,
                     className: 'w-full p-2 bg-gray-600 rounded hover:bg-gray-700 mb-1',
                     onClick: () => handleChallengeSelect(cat.id, i)
-                  }, `Challenge ${i + 1} (${cat.questions[i].difficulty})`)
+                  }, `Challenge ${i + 1}`)
                 )
               )
             )
@@ -219,52 +219,52 @@ try {
       console.log('All JSON loaded');
       window.exercisesData = {
         sql: [
-          { text: 'Identify a basic SQL injection attempt: "SELECT * FROM users WHERE id = 1 OR 1=1"', correctAnswer: 'Yes', difficulty: 'Medium', explanation: 'This is a basic SQL injection where "OR 1=1" always evaluates to true, potentially exposing all records. Mitigation: Use parameterized queries to prevent injection.' },
-          { text: 'Detect a blind SQL injection: "1 AND SUBSTRING((SELECT database()), 1, 1) = \'a\'"', correctAnswer: 'Yes', difficulty: 'Medium', explanation: 'Blind SQL injection infers data via true/false responses. Here, it checks the first character of the database name. Mitigation: Implement Web Application Firewalls (WAFs) and input validation.' },
-          { text: 'Spot a time-based SQL injection: "1 WAITFOR DELAY \'0:0:5\'"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'Time-based injection delays responses to infer data, e.g., using WAITFOR DELAY. Mitigation: Use strict timeout settings and database auditing.' },
-          { text: 'Identify a UNION-based SQL injection: "1 UNION SELECT username, password FROM users"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'UNION-based injection combines results from malicious queries with legitimate ones. Mitigation: Sanitize inputs and restrict database permissions.' },
-          { text: 'Detect a double query injection: "1; DROP TABLE users; --"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'This executes a second query to drop a table, exploiting poor input handling. Mitigation: Use prepared statements and least privilege principles.' },
-          { text: 'Spot an error-based SQL injection: "1 AND 1=(SELECT COUNT(*) FROM information_schema.tables)"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Error-based injection relies on database errors to leak data. Mitigation: Disable error reporting and use exception handling.' },
-          { text: 'Identify a stacked query injection: "1; INSERT INTO users VALUES (\'admin\', \'pass\')"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Stacked queries execute multiple statements, adding unauthorized data. Mitigation: Enforce single-query execution policies.' },
-          { text: 'Detect a SQL injection with comment bypass: "1\'; -- comment"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'Comments bypass input filters, enabling injection. Mitigation: Strip comments and validate input strictly.' },
-          { text: 'Spot a case-sensitive SQL injection: "1 Or 1=1"', correctAnswer: 'Yes', difficulty: 'Medium', explanation: 'Case variation can bypass filters. Mitigation: Normalize input case and use ORM layers.' },
-          { text: 'Identify a multi-statement injection: "1; UPDATE users SET role=\'admin\' WHERE 1=1"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Multiple statements modify data maliciously. Mitigation: Limit query types and use transaction controls.' }
+          { text: 'Is this a safe way to write a database query: "SELECT * FROM users WHERE id = 1"?', correctAnswer: 'No', explanation: 'This query is unsafe because it uses direct input without validation, making it vulnerable to SQL injection. Use prepared statements like "SELECT * FROM users WHERE id = ?" with parameters to protect against attacks.' },
+          { text: 'Does adding "OR 1=1" to a query like "id = 1 OR 1=1" cause a problem?', correctAnswer: 'Yes', explanation: 'Yes, "OR 1=1" always returns true, potentially showing all user data. This is a basic SQL injection attack. Always validate and sanitize inputs.' },
+          { text: 'Is "SELECT * FROM users WHERE name = \'admin\' --" a risky query?', correctAnswer: 'Yes', explanation: 'The "--" comment can bypass filters, allowing injection. Use parameterized queries to ensure safety and block such attempts.' },
+          { text: 'Can "1; DROP TABLE users" harm a database?', correctAnswer: 'Yes', explanation: 'Yes, this could delete the users table if executed, a severe injection attack. Use database permissions to limit destructive commands.' },
+          { text: 'Is checking user input length enough to prevent SQL injection?', correctAnswer: 'No', explanation: 'No, length checks don’t stop injection; attackers can use short malicious code. Use input validation and prepared statements instead.' },
+          { text: 'Does "SELECT * FROM users WHERE id = 1 AND 1=2" hide data?', correctAnswer: 'Yes', explanation: 'Yes, "AND 1=2" makes the query return no results, which can be part of an injection test. Monitor for unusual query patterns.' },
+          { text: 'Is using a blacklist of words enough to stop SQL injection?', correctAnswer: 'No', explanation: 'No, blacklists can be bypassed (e.g., with encodings). Prefer whitelists and parameterized queries for better security.' },
+          { text: 'Can "UPDATE users SET role = \'admin\' WHERE 1=1" be dangerous?', correctAnswer: 'Yes', explanation: 'Yes, "WHERE 1=1" affects all rows, potentially making all users admins. Always specify safe conditions.' },
+          { text: 'Is escaping single quotes enough to secure a query?', correctAnswer: 'No', explanation: 'No, escaping helps but isn’t foolproof against all injections. Use prepared statements for full protection.' },
+          { text: 'Does "SELECT * FROM users WHERE password = \'pass\'" need improvement?', correctAnswer: 'Yes', explanation: 'Yes, hardcoding passwords is insecure and vulnerable. Use hashed passwords and proper authentication systems.' }
         ],
         xss: [
-          { text: 'Identify a reflected XSS: "<script>alert(\'XSS\')</script>"', correctAnswer: 'Yes', difficulty: 'Medium', explanation: 'Reflected XSS injects scripts via user input reflected in responses. Mitigation: Escape output and use Content Security Policy (CSP).' },
-          { text: 'Detect a stored XSS: "<img src=x onerror=alert(\'XSS\')>"', correctAnswer: 'Yes', difficulty: 'Medium', explanation: 'Stored XSS persists in the database, affecting all users. Mitigation: Sanitize and encode all inputs.' },
-          { text: 'Spot a DOM-based XSS: "javascript:alert(\'XSS\')"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'DOM-based XSS manipulates the DOM client-side. Mitigation: Validate client-side input and use safe APIs.' },
-          { text: 'Identify a self-XSS: "prompt(\'Enter code\'); eval(code)"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'Self-XSS requires user action but can be exploited socially. Mitigation: Disable eval and educate users.' },
-          { text: 'Detect a blind XSS: "<svg onload=alert(\'XSS\')>"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Blind XSS triggers in logs or admin panels. Mitigation: Monitor and filter logs with strict rules.' },
-          { text: 'Spot a polyglot XSS: "\'--><script>alert(1)</script>"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Polyglot XSS works across contexts (HTML, SQL). Mitigation: Use multi-layer input validation.' },
-          { text: 'Identify an event handler XSS: "<button onclick=alert(\'XSS\')>Click</button>"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'Event handlers can execute malicious code. Mitigation: Strip event attributes and use safe event listeners.' },
-          { text: 'Detect a filter evasion XSS: "<ScRiPt>alert(\'XSS\')</ScRiPt>"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Case mixing evades filters. Mitigation: Normalize and blacklist scripts.' },
-          { text: 'Spot a JSON-based XSS: "{x: \'<script>alert(1)</script>\'}"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'JSON can carry XSS if not parsed safely. Mitigation: Parse JSON securely on the server.' },
-          { text: 'Identify a CSS-based XSS: "<style>*{background:url(\'javascript:alert(1)\')}"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'CSS can trigger XSS via URLs. Mitigation: Restrict CSS properties and use CSP.' }
+          { text: 'Is "<script>alert(\'Hello\')</script>" a safe input?', correctAnswer: 'No', explanation: 'No, this is a basic XSS attack that runs a script. Always encode or escape user input before displaying it.' },
+          { text: 'Can "<img src=x onerror=alert(\'XSS\')>" cause a problem?', correctAnswer: 'Yes', explanation: 'Yes, this triggers a script if the image fails to load, a common XSS vector. Use HTML sanitization tools.' },
+          { text: 'Is it safe to show user input directly on a webpage?', correctAnswer: 'No', explanation: 'No, unfiltered input can inject scripts. Apply output encoding to prevent XSS.' },
+          { text: 'Does "<a href=\'javascript:alert(1)\'>Click</a>" pose a risk?', correctAnswer: 'Yes', explanation: 'Yes, this link runs JavaScript when clicked. Validate and sanitize URLs.' },
+          { text: 'Is checking for "<script>" enough to block XSS?', correctAnswer: 'No', explanation: 'No, attackers can use other tags (e.g., <img>) or encodings. Use a content security policy (CSP).' },
+          { text: 'Can "onload=alert(\'XSS\')" in an image tag be harmful?', correctAnswer: 'Yes', explanation: 'Yes, it executes when the image loads. Remove event handlers from user input.' },
+          { text: 'Is escaping quotes enough to prevent XSS?', correctAnswer: 'No', explanation: 'No, it helps but doesn’t cover all cases like event handlers. Use comprehensive sanitization.' },
+          { text: 'Does "<svg onload=alert(1)>" need attention?', correctAnswer: 'Yes', explanation: 'Yes, this SVG tag can run scripts. Filter SVG content and enforce CSP.' },
+          { text: 'Is it safe to use eval() with user data?', correctAnswer: 'No', explanation: 'No, eval() can execute malicious scripts. Avoid it and use safer alternatives.' },
+          { text: 'Can "<style>*{color:expression(alert(1))}</style>" cause issues?', correctAnswer: 'Yes', explanation: 'Yes, this uses CSS to run JavaScript. Restrict CSS properties in user input.' }
         ],
         phish: [
-          { text: 'Identify a phishing email: "Your GCash account is locked, click here to unlock"', correctAnswer: 'Yes', difficulty: 'Medium', explanation: 'Phishing uses urgency and fake links. Mitigation: Verify sender domains and avoid clicking unknown links.' },
-          { text: 'Detect a smishing SMS: "Your BDO card is blocked, reply YES to unblock"', correctAnswer: 'Yes', difficulty: 'Medium', explanation: 'Smishing exploits SMS with fake prompts. Mitigation: Never reply to unsolicited texts.' },
-          { text: 'Spot a spear phishing email: "Hi John, urgent invoice from [company] attached"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'Spear phishing targets individuals with personal data. Mitigation: Use email authentication (DMARC, SPF).' },
-          { text: 'Identify a fake Facebook login page: "facebook-login.ph/login"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'Fake pages mimic legit sites. Mitigation: Check URL authenticity and use HTTPS.' },
-          { text: 'Detect a GCash smishing with URL shortening: "bit.ly/gcash-unlock"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Shortened URLs hide phishing destinations. Mitigation: Expand URLs and use security tools.' },
-          { text: 'Spot a BDO phishing with logo mimicry: "bdo-online.ph (with BDO logo)"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Logo mimicry deceives users. Mitigation: Verify official branding channels.' },
-          { text: 'Identify a Shopee smishing: "Your order is delayed, track here"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'Smishing targets e-commerce trust. Mitigation: Contact official support directly.' },
-          { text: 'Detect a Lazada phishing with attachment: "Invoice.pdf (malicious)"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Attachments spread malware. Mitigation: Scan attachments with antivirus.' },
-          { text: 'Spot a casino phishing: "Win $1000, claim now at casino-bonus.com"', correctAnswer: 'Yes', difficulty: 'Medium', explanation: 'Greed-based phishing is common. Mitigation: Avoid unsolicited offers.' },
-          { text: 'Identify a multi-stage phishing: "Verify email, then call this number"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Multi-stage attacks escalate deception. Mitigation: Block and report suspicious contacts.' }
+          { text: 'Is this email safe: "Your PayPal account is suspended, log in at paypal-security.com"?', correctAnswer: 'No', explanation: 'No, "paypal-security.com" is a fake domain (PayPal uses paypal.com). Check the sender and URL before clicking.' },
+          { text: 'Does this SMS look suspicious: "Your BDO card is blocked, reply YES to fix"?', correctAnswer: 'Yes', explanation: 'Yes, banks don’t ask for replies via SMS. Contact the bank directly using official numbers.' },
+          { text: 'Is this email legit: "Urgent: Your Amazon order, click here (amazon-deals2025.com)"?', correctAnswer: 'No', explanation: 'No, "amazon-deals2025.com" is not Amazon’s official site. Verify emails from known contacts only.' },
+          { text: "Does 'Dear [Name], Your GCash is low, top up at gcash-support.net' seem real?", correctAnswer: 'No', explanation: 'No, GCash uses gcash.com. This is a phishing attempt. Avoid links in unsolicited emails.' },
+          { text: 'Is this SMS safe: "Win P1000 from Shopee, claim at bit.ly/shopee-promo"?', correctAnswer: 'No', explanation: 'No, shortened URLs can hide phishing sites. Contact Shopee officially to verify promotions.' },
+          { text: 'Does "Hello, your DHL package is delayed, track at dhl-tracking.org" look okay?', correctAnswer: 'No', explanation: 'No, DHL uses dhl.com. This is a common phishing tactic. Use the official site to track.' },
+          { text: 'Is "IRS: Pay $500 tax debt, click here (irs-payment.gov)" trustworthy?', correctAnswer: 'No', explanation: 'No, the IRS doesn’t email payment links. Verify through official IRS channels (irs.gov).' },
+          { text: 'Does "Netflix: Update payment, login at netflix-login2025.com" seem right?', correctAnswer: 'No', explanation: 'No, Netflix uses netflix.com. This is a phishing email. Check account status via the app.' },
+          { text: 'Is this SMS okay: "Your Globe load is expiring, recharge at globe-promos.ph"?', correctAnswer: 'No', explanation: 'No, Globe uses globe.com.ph. Avoid clicking links in unsolicited texts.' },
+          { text: 'Does "Dear Employee, reset password at company-login.org" need caution?', correctAnswer: 'Yes', explanation: 'Yes, verify with IT if the domain is official. Phishing often mimics internal emails.' }
         ],
         netsec: [
-          { text: 'Identify an open port vulnerability: "Port 23 (Telnet) is open"', correctAnswer: 'Yes', difficulty: 'Medium', explanation: 'Open ports like Telnet are exploitable. Mitigation: Use firewalls and disable unused services.' },
-          { text: 'Detect a weak SSL configuration: "TLS 1.0 detected"', correctAnswer: 'Yes', difficulty: 'Medium', explanation: 'Old TLS versions are vulnerable. Mitigation: Enforce TLS 1.3.' },
-          { text: 'Spot a DDoS attack signature: "1000 requests/sec from single IP"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'High request rates indicate DDoS. Mitigation: Use rate limiting and CDN.' },
-          { text: 'Identify a man-in-the-middle (MITM) risk: "Unencrypted Wi-Fi network"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'Unencrypted networks allow interception. Mitigation: Use VPNs.' },
-          { text: 'Detect a zero-day exploit: "Unknown traffic pattern on port 443"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Zero-days exploit unpatched vulnerabilities. Mitigation: Monitor and patch promptly.' },
-          { text: 'Spot a ransomware C2 channel: "Outbound traffic to .onion"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Darknet traffic signals ransomware. Mitigation: Block Tor and use IDS.' },
-          { text: 'Identify a ARP spoofing attempt: "Duplicate IP on network"', correctAnswer: 'Yes', difficulty: 'Highly Technical', explanation: 'ARP spoofing redirects traffic. Mitigation: Use static ARP or ARP inspection.' },
-          { text: 'Detect a DNS poisoning: "Resolved to wrong IP for google.com"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'Poisoned DNS misdirects users. Mitigation: Use DNSSEC.' },
-          { text: 'Spot a brute force attack: "100 login attempts in 1 minute"', correctAnswer: 'Yes', difficulty: 'Medium', explanation: 'Excessive attempts signal brute force. Mitigation: Implement account lockout.' },
-          { text: 'Identify a VLAN hopping attack: "Traffic between VLANs without routing"', correctAnswer: 'Yes', difficulty: 'Extremely Difficult', explanation: 'VLAN hopping breaches segmentation. Mitigation: Disable trunking on user ports.' }
+          { text: 'Is an open port 80 a security risk?', correctAnswer: 'Yes', explanation: 'Yes, port 80 (HTTP) can be exploited if unmonitored. Use firewalls to restrict access.' },
+          { text: 'Does using "password123" weaken network security?', correctAnswer: 'Yes', explanation: 'Yes, weak passwords are easy to guess. Use strong, unique passwords with a password manager.' },
+          { text: 'Is an unencrypted Wi-Fi network safe?', correctAnswer: 'No', explanation: 'No, data can be intercepted. Use WPA3 or a VPN for security.' },
+          { text: 'Can too many login attempts signal an attack?', correctAnswer: 'Yes', explanation: 'Yes, this may indicate a brute force attack. Enable account lockout after failed attempts.' },
+          { text: 'Is it safe to share your Wi-Fi password with anyone?', correctAnswer: 'No', explanation: 'No, it gives access to your network. Share only with trusted individuals.' },
+          { text: 'Does updating software improve network security?', correctAnswer: 'Yes', explanation: 'Yes, updates patch vulnerabilities. Regularly update all devices and software.' },
+          { text: 'Is a firewall necessary for home networks?', correctAnswer: 'Yes', explanation: 'Yes, it blocks unauthorized access. Enable a firewall on your router.' },
+          { text: 'Can public Wi-Fi expose your data?', correctAnswer: 'Yes', explanation: 'Yes, without encryption, data can be stolen. Use a VPN on public networks.' },
+          { text: 'Is disabling unused ports a good practice?', correctAnswer: 'Yes', explanation: 'Yes, it reduces attack surfaces. Close ports not in use on your devices.' },
+          { text: 'Does a strong antivirus protect against network attacks?', correctAnswer: 'Yes', explanation: 'Yes, it helps detect malware that could compromise your network. Keep it updated.' }
         ]
       };
       window.en = results[1];
