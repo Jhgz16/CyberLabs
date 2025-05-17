@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Feedback = ({ exercise, score, onBack, i18n }) => {
   return (
     <div className="bg-gray-800 p-8 rounded-lg shadow-lg">
@@ -19,5 +17,3 @@ const Feedback = ({ exercise, score, onBack, i18n }) => {
     </div>
   );
 };
-
-export default Feedback;
