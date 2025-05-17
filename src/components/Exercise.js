@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+const { useState } = window.React;
 
 const Exercise = ({ exercise, onSubmit, i18n }) => {
   const [answers, setAnswers] = useState(new Array(exercise.questions.length).fill(''));
@@ -45,5 +45,3 @@ const Exercise = ({ exercise, onSubmit, i18n }) => {
     </div>
   );
 };
-
-export default Exercise;
