@@ -125,6 +125,7 @@ try {
             currentView === 'challenge' && currentChallenge && React.createElement(Challenge, {
               challenge: currentChallenge,
               onSubmit: handleSubmit,
+              showFeedback: showFeedback, // Pass showFeedback as a prop
               i18n
             }),
             showFeedback && currentChallenge && React.createElement(Feedback, {
@@ -161,7 +162,7 @@ try {
   };
 
   const Challenge = function(props) {
-    const { challenge, onSubmit, i18n } = props;
+    const { challenge, onSubmit, showFeedback, i18n } = props;
     const [answer, setAnswer] = useState('');
     const question = challenge.category.questions[challenge.index];
 
@@ -212,7 +213,7 @@ try {
             setAnswer(option);
             onSubmit(challenge.category.id, challenge.index, option);
           },
-          disabled: showFeedback
+          disabled: showFeedback // Use the prop passed from App
         }, option)
       )
     );
