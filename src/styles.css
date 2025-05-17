@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Arial', sans-serif;
+}
+
+input[type="radio"] {
+  accent-color: #10b981;
+}
+
+button:focus {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}

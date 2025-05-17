@@ -1,0 +1,22 @@
+{
+  "name": "cybersecurity-lab",
+  "version": "1.0.0",
+  "description": "Virtual Cybersecurity Lab for Uniformed Personnel",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "rm -rf dist && parcel build index.html --public-url ./ --no-source-maps",
+    "serve": "npx serve dist",
+    "deploy": "npm run build && gh-pages -d dist"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "tailwindcss": "^2.2.19"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1",
+    "parcel": "^2.12.0",
+    "serve": "^14.2.1"
+  }
+}

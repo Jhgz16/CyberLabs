@@ -1,0 +1,16 @@
+{
+  "title": "Cybersecurity Virtual Lab",
+  "dashboard": "Dashboard",
+  "tutorial": "Tutorial",
+  "start": "Start",
+  "submit": "Submit",
+  "results": "Results",
+  "score": "Score",
+  "scoreFor": "Score for",
+  "backToDashboard": "Back to Dashboard",
+  "close": "Close",
+  "tutorialContent": "Welcome to the Cybersecurity Virtual Lab. Select an exercise from the dashboard to begin. Answer questions to test your skills and receive feedback.",
+  "feedbackExcellent": "Excellent! You've mastered this exercise.",
+  "feedbackGood": "Good job! Review the material to improve.",
+  "feedbackImprove": "Needs improvement. Try again after reviewing."
+}

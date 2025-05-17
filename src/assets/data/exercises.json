@@ -1,0 +1,98 @@
+[
+  {
+    "id": "phishing",
+    "title": "Phishing Detection",
+    "description": "Identify phishing emails by analyzing headers and content.",
+    "questions": [
+      {
+        "text": "Which email header indicates a phishing attempt?",
+        "options": ["From: trusted@bank.com", "From: admin@bank-secure.com", "From: user@ph1shing.com"],
+        "correctAnswer": "From: user@ph1shing.com"
+      }
+    ]
+  },
+  {
+    "id": "forensics",
+    "title": "Digital Forensics",
+    "description": "Analyze a disk image for evidence.",
+    "questions": [
+      {
+        "text": "What file contains suspicious activity?",
+        "options": ["log.txt", "readme.md", "config.json"],
+        "correctAnswer": "log.txt"
+      }
+    ]
+  },
+  {
+    "id": "malware",
+    "title": "Malware Analysis",
+    "description": "Dissect a mock malware script.",
+    "questions": [
+      {
+        "text": "What is the malicious function?",
+        "options": ["connect()", "encrypt()", "log()"],
+        "correctAnswer": "encrypt()"
+      }
+    ]
+  },
+  {
+    "id": "ransomware",
+    "title": "Ransomware Mitigation",
+    "description": "Simulate ransomware response.",
+    "questions": [
+      {
+        "text": "What is the first step in ransomware response?",
+        "options": ["Pay the ransom", "Isolate the system", "Reboot"],
+        "correctAnswer": "Isolate the system"
+      }
+    ]
+  },
+  {
+    "id": "network",
+    "title": "Network Security",
+    "description": "Analyze network traffic for anomalies.",
+    "questions": [
+      {
+        "text": "Which protocol is suspicious?",
+        "options": ["HTTP", "FTP", "Telnet"],
+        "correctAnswer": "Telnet"
+      }
+    ]
+  },
+  {
+    "id": "spoofing",
+    "title": "Email/SMS Spoofing",
+    "description": "Detect spoofed messages.",
+    "questions": [
+      {
+        "text": "Which sender is spoofed?",
+        "options": ["admin@company.com", "support@company.com", "admin@companny.com"],
+        "correctAnswer": "admin@companny.com"
+      }
+    ]
+  },
+  {
+    "id": "imsi",
+    "title": "IMSI Catcher",
+    "description": "Simulate mobile network attacks.",
+    "questions": [
+      {
+        "text": "What indicates an IMSI catcher?",
+        "options": ["Strong signal", "Unusual base station ID", "High battery usage"],
+        "correctAnswer": "Unusual base station ID"
+      }
+    ]
+  },
+  {
+    "id": "multivector",
+    "title": "Multi-Vector Attacks",
+    "description": "Handle combined attack scenarios.",
+    "questions": [
+      {
+        "text": "What is the primary attack vector?",
+        "options": ["Phishing", "Malware", "DDoS"],
+        "correctAnswer": "Phishing"
+      }
+    ]
+  }
+]

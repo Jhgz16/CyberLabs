@@ -1,0 +1,16 @@
+{
+  "title": "Laboratorio Virtual de Ciberseguridad",
+  "dashboard": "Tablero",
+  "tutorial": "Tutorial",
+  "start": "Iniciar",
+  "submit": "Enviar",
+  "results": "Resultados",
+  "score": "Puntuación",
+  "scoreFor": "Puntuación para",
+  "backToDashboard": "Volver al Tablero",
+  "close": "Cerrar",
+  "tutorialContent": "Bienvenido al Laboratorio Virtual de Ciberseguridad. Seleccione un ejercicio desde el tablero para comenzar. Responda preguntas para probar sus habilidades y recibir retroalimentación.",
+  "feedbackExcellent": "¡Excelente! Has dominado este ejercicio.",
+  "feedbackGood": "¡Buen trabajo! Revisa el material para mejorar.",
+  "feedbackImprove": "Necesita mejorar. Intenta de nuevo tras repasar."
+}
