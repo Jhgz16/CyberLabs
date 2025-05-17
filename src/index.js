@@ -42,7 +42,9 @@ try {
       { id: 'sql', name: 'SQL Injection', questions: window.exercisesData.sql },
       { id: 'xss', name: 'Cross-Site Scripting (XSS)', questions: window.exercisesData.xss },
       { id: 'phish', name: 'Phishing/Smishing', questions: window.exercisesData.phish },
-      { id: 'netsec', name: 'Network Security', questions: window.exercisesData.netsec }
+      { id: 'netsec', name: 'Network Security', questions: window.exercisesData.netsec },
+      { id: 'forensics', name: 'Digital Forensics', questions: window.exercisesData.forensics },
+      { id: 'crypto', name: 'Cryptography', questions: window.exercisesData.crypto }
     ];
 
     function handleChallengeSelect(categoryId, index) {
@@ -168,16 +170,43 @@ try {
     return React.createElement('div', { className: 'bg-gray-800 p-8 rounded-lg shadow-lg' },
       React.createElement('h2', { className: 'text-2xl font-bold mb-4' }, `${challenge.category.name} - Challenge ${challenge.index + 1}`),
       React.createElement('p', { className: 'text-gray-400 mb-6' }, question.text),
-      React.createElement('input', {
-        type: 'text',
-        value: answer,
-        onChange: e => setAnswer(e.target.value),
-        className: 'p-2 bg-gray-700 rounded w-full mb-4',
-        placeholder: i18n.enterAnswer || 'Enter your answer'
-      }),
+      question.emailContent && React.createElement('div', { className: 'border rounded-lg p-4 bg-white text-black mb-6' },
+        React.createElement('div', { className: 'flex items-center mb-2' },
+          React.createElement('img', { src: 'https://www.google.com/favicon.ico', alt: 'Gmail', className: 'w-6 h-6 mr-2' }),
+          React.createElement('span', { className: 'text-lg font-semibold' }, 'Gmail')
+        ),
+        React.createElement('div', { className: 'border-t pt-2' },
+          React.createElement('p', { className: 'text-sm text-gray-500' }, `From: ${question.emailContent.from}`),
+          React.createElement('p', { className: 'text-sm text-gray-500 mb-2' }, `Subject: ${question.emailContent.subject}`),
+          React.createElement('p', null, question.emailContent.body)
+        )
+      ),
+      question.smsContent && React.createElement('div', { className: 'border rounded-lg p-4 bg-gray-100 text-black mb-6' },
+        React.createElement('div', { className: 'flex items-center mb-2' },
+          React.createElement('span', { className: 'text-lg font-semibold' }, 'Messages')
+        ),
+        React.createElement('div', { className: 'border-t pt-2' },
+          React.createElement('p', { className: 'text-sm text-gray-500' }, `From: ${question.smsContent.from}`),
+          React.createElement('p', null, question.smsContent.body)
+        )
+      ),
+      question.options.map((option, idx) =>
+        React.createElement('label', { key: idx, className: 'block mb-2' },
+          React.createElement('input', {
+            type: 'radio',
+            name: `question-${challenge.index}`,
+            value: option,
+            checked: answer === option,
+            onChange: () => setAnswer(option),
+            className: 'mr-2'
+          }),
+          option
+        )
+      ),
       React.createElement('button', {
-        className: 'p-2 bg-green-600 rounded hover:bg-green-700',
-        onClick: () => onSubmit(challenge.category.id, challenge.index, answer)
+        className: 'p-2 bg-green-600 rounded hover:bg-green-700 mt-4',
+        onClick: () => onSubmit(challenge.category.id, challenge.index, answer),
+        disabled: !answer
       }, i18n.submit || 'Submit')
     );
   };
@@ -219,52 +248,76 @@ try {
       console.log('All JSON loaded');
       window.exercisesData = {
         sql: [
-          { text: 'Is this a safe way to write a database query: "SELECT * FROM users WHERE id = 1"?', correctAnswer: 'No', explanation: 'This query is unsafe because it uses direct input without validation, making it vulnerable to SQL injection. Use prepared statements like "SELECT * FROM users WHERE id = ?" with parameters to protect against attacks.' },
-          { text: 'Does adding "OR 1=1" to a query like "id = 1 OR 1=1" cause a problem?', correctAnswer: 'Yes', explanation: 'Yes, "OR 1=1" always returns true, potentially showing all user data. This is a basic SQL injection attack. Always validate and sanitize inputs.' },
-          { text: 'Is "SELECT * FROM users WHERE name = \'admin\' --" a risky query?', correctAnswer: 'Yes', explanation: 'The "--" comment can bypass filters, allowing injection. Use parameterized queries to ensure safety and block such attempts.' },
-          { text: 'Can "1; DROP TABLE users" harm a database?', correctAnswer: 'Yes', explanation: 'Yes, this could delete the users table if executed, a severe injection attack. Use database permissions to limit destructive commands.' },
-          { text: 'Is checking user input length enough to prevent SQL injection?', correctAnswer: 'No', explanation: 'No, length checks don’t stop injection; attackers can use short malicious code. Use input validation and prepared statements instead.' },
-          { text: 'Does "SELECT * FROM users WHERE id = 1 AND 1=2" hide data?', correctAnswer: 'Yes', explanation: 'Yes, "AND 1=2" makes the query return no results, which can be part of an injection test. Monitor for unusual query patterns.' },
-          { text: 'Is using a blacklist of words enough to stop SQL injection?', correctAnswer: 'No', explanation: 'No, blacklists can be bypassed (e.g., with encodings). Prefer whitelists and parameterized queries for better security.' },
-          { text: 'Can "UPDATE users SET role = \'admin\' WHERE 1=1" be dangerous?', correctAnswer: 'Yes', explanation: 'Yes, "WHERE 1=1" affects all rows, potentially making all users admins. Always specify safe conditions.' },
-          { text: 'Is escaping single quotes enough to secure a query?', correctAnswer: 'No', explanation: 'No, escaping helps but isn’t foolproof against all injections. Use prepared statements for full protection.' },
-          { text: 'Does "SELECT * FROM users WHERE password = \'pass\'" need improvement?', correctAnswer: 'Yes', explanation: 'Yes, hardcoding passwords is insecure and vulnerable. Use hashed passwords and proper authentication systems.' }
+          { text: 'You’re reviewing a login form on a website. The backend query is "SELECT * FROM users WHERE username = \'" + input + "\' AND password = \'" + input + "\'". A user enters "admin\' --" as the username. What happens?', options: ['Login fails', 'Login succeeds for admin', 'Error occurs'], correctAnswer: 'Login succeeds for admin', explanation: 'The input "admin\' --" comments out the rest of the query, making it "SELECT * FROM users WHERE username = \'admin\'". This logs in as admin without a password. Use prepared statements to prevent this.' },
+          { text: 'A website query is "SELECT * FROM products WHERE id = " + input. An attacker enters "1 OR 1=1". What will this query return?', options: ['One product', 'All products', 'No products'], correctAnswer: 'All products', explanation: '"OR 1=1" always evaluates to true, so the query returns all products. Use parameterized queries to stop this.' },
+          { text: 'You see a query log: "SELECT * FROM users WHERE id = 1; DROP TABLE users". What does this do?', options: ['Selects user with id 1', 'Drops users table', 'Both'], correctAnswer: 'Both', explanation: 'The semicolon separates queries, executing both. The "DROP TABLE" deletes the users table. Limit query permissions to prevent destructive actions.' },
+          { text: 'An attacker enters "1\' OR \'1\'=\'1" into a search field. What is the goal?', options: ['Break the website', 'Bypass authentication', 'Delete data'], correctAnswer: 'Bypass authentication', explanation: 'This input makes the query always true, potentially bypassing login checks. Use input validation to block this.' },
+          { text: 'A query shows "SELECT * FROM users WHERE email = \'" + input + "\'". The input is "user@domain.com\' AND 1=2 --". What happens?', options: ['Returns user', 'Returns nothing', 'Deletes data'], correctAnswer: 'Returns nothing', explanation: '"AND 1=2" makes the query false, and "--" comments out the rest. Use prepared statements to avoid such tampering.' },
+          { text: 'A form executes "SELECT * FROM orders WHERE order_id = " + input. The input is "1 UNION SELECT username, password FROM users". What happens?', options: ['Shows order', 'Shows user data', 'Crashes'], correctAnswer: 'Shows user data', explanation: 'UNION combines results, exposing usernames and passwords. Restrict database permissions and sanitize inputs.' },
+          { text: 'You notice a query "UPDATE users SET role = \'admin\' WHERE id = " + input with input "1 OR 1=1". What happens?', options: ['Updates one user', 'Updates all users', 'Fails'], correctAnswer: 'Updates all users', explanation: '"OR 1=1" affects all rows, making everyone an admin. Use specific conditions and validate inputs.' },
+          { text: 'A login form uses "SELECT * FROM users WHERE username = \'" + input + "\'". The input is "\' OR \'\'=\'". What happens?', options: ['Logs in as any user', 'Fails login', 'Crashes'], correctAnswer: 'Logs in as any user', explanation: '"\' OR \'\'=\'" always returns true, logging in without credentials. Use parameterized queries.' },
+          { text: 'A query log shows "SELECT * FROM users WHERE id = 1 AND SLEEP(5)". What is the attacker testing?', options: ['Data theft', 'Time-based injection', 'Error handling'], correctAnswer: 'Time-based injection', explanation: 'SLEEP(5) delays the response, testing for blind SQL injection. Monitor query delays and block such functions.' },
+          { text: 'A query "SELECT * FROM users WHERE id = " + input uses "1; INSERT INTO users (username, password) VALUES (\'hacker\', \'pass\')". What happens?', options: ['Selects user', 'Adds new user', 'Both'], correctAnswer: 'Both', explanation: 'The semicolon allows a second query to add a user. Use single-query execution to prevent this.' }
         ],
         xss: [
-          { text: 'Is "<script>alert(\'Hello\')</script>" a safe input?', correctAnswer: 'No', explanation: 'No, this is a basic XSS attack that runs a script. Always encode or escape user input before displaying it.' },
-          { text: 'Can "<img src=x onerror=alert(\'XSS\')>" cause a problem?', correctAnswer: 'Yes', explanation: 'Yes, this triggers a script if the image fails to load, a common XSS vector. Use HTML sanitization tools.' },
-          { text: 'Is it safe to show user input directly on a webpage?', correctAnswer: 'No', explanation: 'No, unfiltered input can inject scripts. Apply output encoding to prevent XSS.' },
-          { text: 'Does "<a href=\'javascript:alert(1)\'>Click</a>" pose a risk?', correctAnswer: 'Yes', explanation: 'Yes, this link runs JavaScript when clicked. Validate and sanitize URLs.' },
-          { text: 'Is checking for "<script>" enough to block XSS?', correctAnswer: 'No', explanation: 'No, attackers can use other tags (e.g., <img>) or encodings. Use a content security policy (CSP).' },
-          { text: 'Can "onload=alert(\'XSS\')" in an image tag be harmful?', correctAnswer: 'Yes', explanation: 'Yes, it executes when the image loads. Remove event handlers from user input.' },
-          { text: 'Is escaping quotes enough to prevent XSS?', correctAnswer: 'No', explanation: 'No, it helps but doesn’t cover all cases like event handlers. Use comprehensive sanitization.' },
-          { text: 'Does "<svg onload=alert(1)>" need attention?', correctAnswer: 'Yes', explanation: 'Yes, this SVG tag can run scripts. Filter SVG content and enforce CSP.' },
-          { text: 'Is it safe to use eval() with user data?', correctAnswer: 'No', explanation: 'No, eval() can execute malicious scripts. Avoid it and use safer alternatives.' },
-          { text: 'Can "<style>*{color:expression(alert(1))}</style>" cause issues?', correctAnswer: 'Yes', explanation: 'Yes, this uses CSS to run JavaScript. Restrict CSS properties in user input.' }
+          { text: 'You’re auditing a blog site. A user submits a comment "<script>alert(\'Hacked\')</script>". How does this affect the site?', options: ['Shows an alert', 'Nothing happens', 'Crashes'], correctAnswer: 'Shows an alert', explanation: 'This is a reflected XSS attack. The script runs when the comment is displayed. Use output encoding to prevent this.' },
+          { text: 'A website displays a user profile with input "<img src=x onerror=alert(\'XSS\')>". What happens when viewed?', options: ['Image loads', 'Alert pops up', 'Profile hides'], correctAnswer: 'Alert pops up', explanation: 'The onerror event triggers the script. Sanitize inputs to remove event handlers.' },
+          { text: 'A search page shows results as "You searched for: " + input. The input is "<script>document.location=\'evil.com\'</script>". What happens?', options: ['Redirects to evil.com', 'Shows search', 'Errors'], correctAnswer: 'Redirects to evil.com', explanation: 'The script redirects users to a malicious site. Escape user input before displaying.' },
+          { text: 'A form accepts a URL as "<a href=\'javascript:alert(1)\'>Click</a>". What happens when clicked?', options: ['Opens link', 'Shows alert', 'Nothing'], correctAnswer: 'Shows alert', explanation: 'The "javascript:" URI runs the script. Validate URLs to block this.' },
+          { text: 'A site renders a comment "<svg onload=alert(\'XSS\')>". What happens?', options: ['SVG displays', 'Alert triggers', 'Comment hides'], correctAnswer: 'Alert triggers', explanation: 'The onload event in SVG runs the script. Filter SVG content to prevent XSS.' },
+          { text: 'A forum allows HTML comments. A user posts "<b onmouseover=alert(1)>Hover</b>". What happens?', options: ['Text is bold', 'Alert on hover', 'Nothing'], correctAnswer: 'Alert on hover', explanation: 'The onmouseover event triggers the script. Remove event attributes from user input.' },
+          { text: 'A site shows a profile field as "Name: " + input. The input is "<style>body{display:none}</style>". What happens?', options: ['Hides page', 'Shows name', 'Crashes'], correctAnswer: 'Hides page', explanation: 'The style tag hides the page. Block CSS injections with a content security policy.' },
+          { text: 'A chat app displays messages with "<iframe src=javascript:alert(1)>". What happens?', options: ['Iframe loads', 'Alert runs', 'Message hides'], correctAnswer: 'Alert runs', explanation: 'The iframe’s src runs the script. Disallow iframes in user input.' },
+          { text: 'A site renders input "<input value=1 onfocus=alert(1)>". What happens when the field is focused?', options: ['Alert triggers', 'Field focuses', 'Nothing'], correctAnswer: 'Alert triggers', explanation: 'The onfocus event runs the script. Strip event handlers from inputs.' },
+          { text: 'A user submits "<object data=javascript:alert(1)>". What happens?', options: ['Object loads', 'Alert runs', 'Nothing'], correctAnswer: 'Alert runs', explanation: 'The object tag runs the script. Block object tags in user input.' }
         ],
         phish: [
-          { text: 'Is this email safe: "Your PayPal account is suspended, log in at paypal-security.com"?', correctAnswer: 'No', explanation: 'No, "paypal-security.com" is a fake domain (PayPal uses paypal.com). Check the sender and URL before clicking.' },
-          { text: 'Does this SMS look suspicious: "Your BDO card is blocked, reply YES to fix"?', correctAnswer: 'Yes', explanation: 'Yes, banks don’t ask for replies via SMS. Contact the bank directly using official numbers.' },
-          { text: 'Is this email legit: "Urgent: Your Amazon order, click here (amazon-deals2025.com)"?', correctAnswer: 'No', explanation: 'No, "amazon-deals2025.com" is not Amazon’s official site. Verify emails from known contacts only.' },
-          { text: "Does 'Dear [Name], Your GCash is low, top up at gcash-support.net' seem real?", correctAnswer: 'No', explanation: 'No, GCash uses gcash.com. This is a phishing attempt. Avoid links in unsolicited emails.' },
-          { text: 'Is this SMS safe: "Win P1000 from Shopee, claim at bit.ly/shopee-promo"?', correctAnswer: 'No', explanation: 'No, shortened URLs can hide phishing sites. Contact Shopee officially to verify promotions.' },
-          { text: 'Does "Hello, your DHL package is delayed, track at dhl-tracking.org" look okay?', correctAnswer: 'No', explanation: 'No, DHL uses dhl.com. This is a common phishing tactic. Use the official site to track.' },
-          { text: 'Is "IRS: Pay $500 tax debt, click here (irs-payment.gov)" trustworthy?', correctAnswer: 'No', explanation: 'No, the IRS doesn’t email payment links. Verify through official IRS channels (irs.gov).' },
-          { text: 'Does "Netflix: Update payment, login at netflix-login2025.com" seem right?', correctAnswer: 'No', explanation: 'No, Netflix uses netflix.com. This is a phishing email. Check account status via the app.' },
-          { text: 'Is this SMS okay: "Your Globe load is expiring, recharge at globe-promos.ph"?', correctAnswer: 'No', explanation: 'No, Globe uses globe.com.ph. Avoid clicking links in unsolicited texts.' },
-          { text: 'Does "Dear Employee, reset password at company-login.org" need caution?', correctAnswer: 'Yes', explanation: 'Yes, verify with IT if the domain is official. Phishing often mimics internal emails.' }
+          { text: 'You receive an email in your Gmail inbox. What is this email?', emailContent: { from: 'support@paypal-security.com', subject: 'Account Suspension Alert', body: 'Your PayPal account has been suspended due to unusual activity. Click here to verify: paypal-security.com' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', explanation: 'The domain "paypal-security.com" is not PayPal’s official site (paypal.com). Always verify the sender’s domain and avoid clicking links in unsolicited emails.' },
+          { text: 'You get an SMS on your phone. What is this message?', smsContent: { from: '+639123456789', body: 'Your BDO card is blocked. Reply YES to unblock now.' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', explanation: 'Banks don’t ask for SMS replies to unblock cards. This is smishing. Contact the bank using official channels.' },
+          { text: 'An email appears in your Gmail. Is it safe?', emailContent: { from: 'no-reply@amazon-deals2025.com', subject: 'Urgent: Confirm Your Amazon Order', body: 'Your order #12345 is on hold. Click here to confirm: amazon-deals2025.com' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', explanation: 'The domain "amazon-deals2025.com" isn’t Amazon’s (amazon.com). Verify orders directly on Amazon’s official site.' },
+          { text: 'You receive an SMS. What is it?', smsContent: { from: 'GCash Support', body: 'Your GCash balance is low. Top up now at gcash-support.net' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', explanation: 'GCash uses gcash.com, not gcash-support.net. This is smishing. Use the official app to check your balance.' },
+          { text: 'An email arrives in your Gmail. Is it legitimate?', emailContent: { from: 'promo@shopee-promo.com', subject: 'Win P1000 Voucher!', body: 'Claim your voucher now: bit.ly/shopee-promo' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', explanation: 'Shortened URLs like "bit.ly" can hide phishing sites. Shopee uses shopee.ph. Verify promotions directly.' },
+          { text: 'You get an email in Gmail. What is it?', emailContent: { from: 'tracking@dhl-tracking.org', subject: 'DHL Package Delayed', body: 'Your package is delayed. Track here: dhl-tracking.org' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', explanation: 'DHL uses dhl.com, not dhl-tracking.org. Track packages on the official site.' },
+          { text: 'An SMS appears on your phone. Is it safe?', smsContent: { from: 'IRS', body: 'You owe $500 in taxes. Pay now at irs-payment.gov' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', explanation: 'The IRS doesn’t send payment links via SMS. Use irs.gov to verify tax issues.' },
+          { text: 'You receive an email in Gmail. Is it trustworthy?', emailContent: { from: 'billing@netflix-login2025.com', subject: 'Update Your Netflix Payment', body: 'Payment failed. Update here: netflix-login2025.com' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', explanation: 'Netflix uses netflix.com. This is phishing. Check payments in the official app.' },
+          { text: 'An SMS arrives. What is it?', smsContent: { from: 'Globe', body: 'Your load expires soon. Recharge at globe-promos.ph' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', explanation: 'Globe uses globe.com.ph. This is smishing. Recharge via official channels.' },
+          { text: 'You get an email in Gmail. Is it safe?', emailContent: { from: 'hr@company-login.org', subject: 'Password Reset Required', body: 'Reset your employee password at company-login.org' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', explanation: 'Verify with your IT team. Phishing often mimics internal emails. Use official domains.' }
         ],
         netsec: [
-          { text: 'Is an open port 80 a security risk?', correctAnswer: 'Yes', explanation: 'Yes, port 80 (HTTP) can be exploited if unmonitored. Use firewalls to restrict access.' },
-          { text: 'Does using "password123" weaken network security?', correctAnswer: 'Yes', explanation: 'Yes, weak passwords are easy to guess. Use strong, unique passwords with a password manager.' },
-          { text: 'Is an unencrypted Wi-Fi network safe?', correctAnswer: 'No', explanation: 'No, data can be intercepted. Use WPA3 or a VPN for security.' },
-          { text: 'Can too many login attempts signal an attack?', correctAnswer: 'Yes', explanation: 'Yes, this may indicate a brute force attack. Enable account lockout after failed attempts.' },
-          { text: 'Is it safe to share your Wi-Fi password with anyone?', correctAnswer: 'No', explanation: 'No, it gives access to your network. Share only with trusted individuals.' },
-          { text: 'Does updating software improve network security?', correctAnswer: 'Yes', explanation: 'Yes, updates patch vulnerabilities. Regularly update all devices and software.' },
-          { text: 'Is a firewall necessary for home networks?', correctAnswer: 'Yes', explanation: 'Yes, it blocks unauthorized access. Enable a firewall on your router.' },
-          { text: 'Can public Wi-Fi expose your data?', correctAnswer: 'Yes', explanation: 'Yes, without encryption, data can be stolen. Use a VPN on public networks.' },
-          { text: 'Is disabling unused ports a good practice?', correctAnswer: 'Yes', explanation: 'Yes, it reduces attack surfaces. Close ports not in use on your devices.' },
-          { text: 'Does a strong antivirus protect against network attacks?', correctAnswer: 'Yes', explanation: 'Yes, it helps detect malware that could compromise your network. Keep it updated.' }
+          { text: 'You’re setting up a home network. A scan shows port 22 (SSH) is open on your router. What should you do?', options: ['Leave it open', 'Close it if unused', 'Change the port'], correctAnswer: 'Close it if unused', explanation: 'Port 22 can be exploited if SSH isn’t needed. Close unused ports to reduce risks.' },
+          { text: 'Your company’s server uses "admin" as the password. What should you change?', options: ['Nothing', 'Use a stronger password', 'Disable the account'], correctAnswer: 'Use a stronger password', explanation: 'Weak passwords like "admin" are easily guessed. Use a strong, unique password.' },
+          { text: 'You connect to a café’s Wi-Fi. The network is unencrypted. What should you do?', options: ['Browse normally', 'Use a VPN', 'Disconnect'], correctAnswer: 'Use a VPN', explanation: 'Unencrypted Wi-Fi exposes your data. A VPN encrypts your traffic.' },
+          { text: 'A server log shows 50 failed login attempts in 1 minute. What is likely happening?', options: ['Normal activity', 'Brute force attack', 'User error'], correctAnswer: 'Brute force attack', explanation: 'Many failed logins suggest a brute force attack. Enable account lockout policies.' },
+          { text: 'You share your Wi-Fi password with a friend. Is this safe?', options: ['Yes', 'No', 'Only if trusted'], correctAnswer: 'Only if trusted', explanation: 'Sharing Wi-Fi passwords can risk network access. Only share with trusted people.' },
+          { text: 'Your router hasn’t been updated in a year. What should you do?', options: ['Leave it', 'Update firmware', 'Replace it'], correctAnswer: 'Update firmware', explanation: 'Outdated firmware has vulnerabilities. Regular updates improve security.' },
+          { text: 'Your company doesn’t use a firewall. Is this a problem?', options: ['No', 'Yes', 'Only for servers'], correctAnswer: 'Yes', explanation: 'Firewalls block unauthorized access. They’re essential for all networks.' },
+          { text: 'You’re on public Wi-Fi and need to check email. What’s the safest way?', options: ['Check normally', 'Use a VPN', 'Wait until home'], correctAnswer: 'Use a VPN', explanation: 'Public Wi-Fi can be intercepted. A VPN secures your connection.' },
+          { text: 'A scan shows port 445 (SMB) open on your PC. What should you do?', options: ['Leave it', 'Close it', 'Monitor it'], correctAnswer: 'Close it', explanation: 'Port 445 can be exploited (e.g., by ransomware). Close it if not needed.' },
+          { text: 'Your antivirus hasn’t updated in months. What should you do?', options: ['Ignore it', 'Update it', 'Uninstall it'], correctAnswer: 'Update it', explanation: 'Antivirus needs updates to detect new threats. Keep it current.' }
+        ],
+        forensics: [
+          { text: 'You’re investigating a breach. A log shows "GET /login.php?user=admin\' --". What attack is this?', options: ['SQL Injection', 'XSS', 'Phishing'], correctAnswer: 'SQL Injection', explanation: 'The "--" comments out the query, a sign of SQL injection. Check logs for similar patterns.' },
+          { text: 'A user reports a pop-up on their browser. You find "<script>alert(1)</script>" in the page source. What happened?', options: ['SQL Injection', 'XSS', 'Brute Force'], correctAnswer: 'XSS', explanation: 'This script indicates an XSS attack. Review input sanitization on the site.' },
+          { text: 'You find a deleted file "invoice.pdf.exe" in a user’s trash. What is this likely?', options: ['Normal file', 'Malware', 'Backup'], correctAnswer: 'Malware', explanation: 'The ".exe" extension suggests malware disguised as a PDF. Scan the system.' },
+          { text: 'A server log shows outbound traffic to 192.168.1.100 on port 4444. What might this be?', options: ['Normal traffic', 'C2 communication', 'File transfer'], correctAnswer: 'C2 communication', explanation: 'Port 4444 is often used for command-and-control (C2). Investigate the IP.' },
+          { text: 'You’re analyzing a PC. The timestamp of a file "keylogger.exe" matches the time of a breach. What should you do?', options: ['Ignore it', 'Analyze the file', 'Delete it'], correctAnswer: 'Analyze the file', explanation: 'The timestamp suggests involvement in the breach. Analyze it forensically.' },
+          { text: 'A user clicked a link, and you find "cmd.exe" ran afterward. What happened?', options: ['Normal operation', 'Malware execution', 'System update'], correctAnswer: 'Malware execution', explanation: 'cmd.exe running after a link click suggests malware. Check the link and system.' },
+          { text: 'You find a registry entry "HKLM\\Software\\Run\\suspicious.exe". What is this?', options: ['Startup program', 'System file', 'Malware persistence'], correctAnswer: 'Malware persistence', explanation: 'Registry Run keys can launch malware on boot. Investigate the file.' },
+          { text: 'A log shows a file "data.zip" was accessed, then deleted. What should you do?', options: ['Ignore it', 'Recover the file', 'Check backups'], correctAnswer: 'Recover the file', explanation: 'Deleted files may contain evidence. Use forensic tools to recover it.' },
+          { text: 'You’re analyzing network traffic. You see "POST /upload.php HTTP/1.1" with a large data transfer. What might this be?', options: ['Normal upload', 'Data exfiltration', 'Website update'], correctAnswer: 'Data exfiltration', explanation: 'Large POST requests can indicate data theft. Investigate the destination.' },
+          { text: 'A user’s browser history shows "evil.com/login". What should you check next?', options: ['Browser settings', 'Network logs', 'System files'], correctAnswer: 'Network logs', explanation: 'Check network logs for connections to "evil.com" to trace the attack.' }
+        ],
+        crypto: [
+          { text: 'You receive a message encoded as "SVV". What cipher might this be?', options: ['Caesar', 'Base64', 'AES'], correctAnswer: 'Base64', explanation: 'SVV decodes to "HI" in Base64. It’s a common encoding for data.' },
+          { text: 'A file is encrypted with a key "k3y". What type of encryption is likely used?', options: ['Symmetric', 'Asymmetric', 'Hashing'], correctAnswer: 'Symmetric', explanation: 'A single key suggests symmetric encryption (e.g., AES). Use the same key to decrypt.' },
+          { text: 'You see a hash "5f4dcc3b5aa765d61d8327deb882cf99". What type is it?', options: ['MD5', 'SHA-256', 'Base64'], correctAnswer: 'MD5', explanation: 'This 32-character hash is MD5. It’s insecure; use SHA-256 instead.' },
+          { text: 'A message says "Shift by 3: FDH". What is the plaintext?', options: ['ABC', 'DEF', 'GHI'], correctAnswer: 'ABC', explanation: 'A Caesar cipher with shift 3 (F->C, D->A, H->E) decodes FDH to ABC.' },
+          { text: 'You’re auditing a site using RSA. The private key is exposed. What should you do?', options: ['Nothing', 'Generate new keys', 'Change passwords'], correctAnswer: 'Generate new keys', explanation: 'An exposed private key compromises RSA. Generate new keys immediately.' },
+          { text: 'A password is hashed as "password". Is this secure?', options: ['Yes', 'No', 'Maybe'], correctAnswer: 'No', explanation: 'Plaintext hashing is insecure. Use a strong algorithm like bcrypt with a salt.' },
+          { text: 'You see "U2FsdGVkX1". What is this likely?', options: ['Base64', 'AES', 'RSA'], correctAnswer: 'AES', explanation: 'This prefix indicates AES encryption (OpenSSL format). Decrypt with the correct key.' },
+          { text: 'A message uses a substitution cipher: "ZHOFRPH". What is the plaintext?', options: ['WELCOME', 'GOODBYE', 'HELLO'], correctAnswer: 'WELCOME', explanation: 'A substitution cipher maps letters (e.g., Z->W). ZHOFRPH decodes to WELCOME.' },
+          { text: 'You’re reviewing a site using TLS 1.0. Is this secure?', options: ['Yes', 'No', 'Maybe'], correctAnswer: 'No', explanation: 'TLS 1.0 is outdated and vulnerable. Upgrade to TLS 1.3.' },
+          { text: 'A file uses a 56-bit key for encryption. Is this secure?', options: ['Yes', 'No', 'Maybe'], correctAnswer: 'No', explanation: '56-bit keys (e.g., DES) are weak and easily cracked. Use 256-bit keys (e.g., AES-256).' }
         ]
       };
       window.en = results[1];
