@@ -125,7 +125,7 @@ try {
             currentView === 'challenge' && currentChallenge && React.createElement(Challenge, {
               challenge: currentChallenge,
               onSubmit: handleSubmit,
-              showFeedback: showFeedback, // Pass showFeedback as a prop
+              showFeedback: showFeedback,
               i18n
             }),
             showFeedback && currentChallenge && React.createElement(Feedback, {
@@ -172,10 +172,7 @@ try {
       question.emailContent && React.createElement('div', { className: 'border rounded-lg p-4 bg-white text-black mb-6' },
         React.createElement('div', { className: 'flex items-center mb-2' },
           React.createElement('img', { src: 'https://www.google.com/favicon.ico', alt: 'Gmail', className: 'w-6 h-6 mr-2' }),
-          React.createElement('span', {
-            className: 'text-lg font-semibold',
-            title: question.emailContent.originalSender || question.emailContent.from
-          }, question.emailContent.from)
+          React.createElement('span', { className: 'text-lg font-semibold' }, question.emailContent.from)
         ),
         React.createElement('div', { className: 'border-t pt-2' },
           React.createElement('p', { className: 'text-sm text-gray-500 mb-2' }, `Subject: ${question.emailContent.subject}`),
@@ -213,7 +210,7 @@ try {
             setAnswer(option);
             onSubmit(challenge.category.id, challenge.index, option);
           },
-          disabled: showFeedback // Use the prop passed from App
+          disabled: showFeedback
         }, option)
       )
     );
