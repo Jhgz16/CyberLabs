@@ -175,7 +175,7 @@ try {
           React.createElement('span', { className: 'text-lg font-semibold' }, 'Gmail')
         ),
         React.createElement('div', { className: 'border-t pt-2' },
-          React.createElement('p', { className: 'text-sm text-gray-500 mb-2' }, `From: `, React.createElement('span', { title: 'Potential phishing sender', style: { color: 'blue', textDecoration: 'underline' } }, `${question.emailContent.from}`)),
+          React.createElement('p', { className: 'text-sm text-gray-500 mb-2' }, `From: `, React.createElement('span', { title: question.emailContent.maskedUrl }, `${question.emailContent.from}`)),
           React.createElement('p', { className: 'text-sm text-gray-500 mb-2' }, `Subject: ${question.emailContent.subject}`),
           React.createElement('p', {
             dangerouslySetInnerHTML: {
