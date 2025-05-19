@@ -177,7 +177,14 @@ try {
         React.createElement('div', { className: 'border-t pt-2' },
           React.createElement('p', { className: 'text-sm text-gray-500' }, `From: ${question.emailContent.from}`),
           React.createElement('p', { className: 'text-sm text-gray-500 mb-2' }, `Subject: ${question.emailContent.subject}`),
-          React.createElement('p', null, question.emailContent.body)
+          React.createElement('p', {
+            dangerouslySetInnerHTML: {
+              __html: question.emailContent.body.replace(
+                /https?:\/\/[^\s]+/g,
+                url => `<a href="#" title="${question.emailContent.maskedUrl || url}" style="color: blue; text-decoration: underline;">${url}</a>`
+              )
+            }
+          })
         )
       ),
       question.smsContent && React.createElement('div', { className: 'border rounded-lg p-4 bg-gray-100 text-black mb-6' },
@@ -186,7 +193,14 @@ try {
         ),
         React.createElement('div', { className: 'border-t pt-2' },
           React.createElement('p', { className: 'text-sm text-gray-500' }, `From: ${question.smsContent.from}`),
-          React.createElement('p', null, question.smsContent.body)
+          React.createElement('p', {
+            dangerouslySetInnerHTML: {
+              __html: question.smsContent.body.replace(
+                /https?:\/\/[^\s]+/g,
+                url => `<a href="#" title="${question.smsContent.maskedUrl || url}" style="color: blue; text-decoration: underline;">${url}</a>`
+              )
+            }
+          })
         )
       ),
       question.options.map((option, idx) =>
@@ -242,16 +256,16 @@ try {
       console.log('All JSON loaded');
       window.exercisesData = {
         phish: [
-          { text: 'You receive an email in Gmail. Is it legitimate?', emailContent: { from: 'support@paypa1.com', subject: 'Urgent: Account Verification', body: 'Your PayPaI account needs verification. Click here: https://secure.paypal-login.com', maskedUrl: 'https://secure.paypal-login.com' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', difficulty: 'Medium', explanation: 'Homoglyph "1" mimics "l", masked URL hides phishing site. PayPal uses paypal.com.' },
-          { text: 'An SMS arrives on your phone. Is it safe?', smsContent: { from: '+639123456789', body: 'Your BDO card is locked. Reply YES or visit https://bdo-bank.online', maskedUrl: 'https://bdo-bank.online' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', difficulty: 'Medium', explanation: 'Homoglyph "1" mimics "l", link shim hides real URL. BDO uses bdo.com.ph.' },
-          { text: 'A Gmail email appears. Is it trustworthy?', emailContent: { from: 'no-reply@amazon-dea1s2025.com', subject: 'Order Confirmation #XYZ123', body: 'Your Amazon order is confirmed. Track here: https://amazon.order-tracking.org', maskedUrl: 'https://amazon.order-tracking.org' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', difficulty: 'Highly Technical', explanation: 'Homoglyph "1" replaces "l", masked URL mimics Amazon. Verify on amazon.com.' },
-          { text: 'You get an SMS. What is it?', smsContent: { from: 'GCash Support', body: 'Low balance alert. Top up at https://secure.gcash-login.net', maskedUrl: 'https://secure.gcash-login.net' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', difficulty: 'Medium', explanation: 'Link shim and fake domain. GCash uses gcash.com.' },
-          { text: 'A Gmail email arrives. Is it safe?', emailContent: { from: 'promo@shopee-prom0.com', subject: 'Win P5000!', body: 'Claim your prize: https://shopee-promotions.ph', maskedUrl: 'https://shopee-promotions.ph' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', difficulty: 'Highly Technical', explanation: 'Homoglyph "0" mimics "o", shortened URL with mask. Shopee uses shopee.ph.' },
-          { text: 'An SMS appears. Is it legitimate?', smsContent: { from: 'DHL Tracking', body: 'Your package is delayed. Track at https://dhl-delivery-service.com', maskedUrl: 'https://dhl-delivery-service.com' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', difficulty: 'Medium', explanation: 'URL masking hides phishing site. DHL uses dhl.com.' },
-          { text: 'You receive a Gmail email. What is it?', emailContent: { from: 'tax@irs.gov.ph', subject: 'Tax Payment Due', body: 'Pay $2000 by May 20, 2025. Click: https://secure-tax.us.gov', maskedUrl: 'https://secure-tax.us.gov' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', difficulty: 'Highly Technical', explanation: 'Fake ".gov.ph", masked URL mimics IRS. Verify via irs.gov.' },
-          { text: 'An SMS arrives. Is it safe?', smsContent: { from: '+12025550123', body: 'Netflix billing issue. Update at https://netflix-billing.support', maskedUrl: 'https://netflix-billing.support' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', difficulty: 'Highly Technical', explanation: 'Homoglyph "1" mimics "l", masked URL. Netflix uses netflix.com.' },
-          { text: 'A Gmail email appears. Is it trustworthy?', emailContent: { from: 'support@gmaìl.com', subject: 'Account Security Alert', body: 'Your account is at risk. Verify: https://accounts.google-login.com', maskedUrl: 'https://accounts.google-login.com' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', difficulty: 'Extremely Highly Technical', explanation: 'Homoglyph "ì" mimics "i", masked URL mimics Google. Use accounts.google.com.' },
-          { text: 'You get an SMS. What is it?', smsContent: { from: 'Globe PH', body: 'Your load expires. Recharge at https://globe-mobile.topup', maskedUrl: 'https://globe-mobile.topup' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', difficulty: 'Highly Technical', explanation: 'Homoglyph "0" mimics "o", masked URL. Globe uses globe.com.ph.' }
+          { text: 'You receive an email in Gmail. Is it legitimate?', emailContent: { from: 'support@paypa1.com', subject: 'Urgent: Account Verification', body: 'Your PayPaI account needs verification. Click here: https://paypa1.com/verify', maskedUrl: 'https://secure.paypal-login.com' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', difficulty: 'Medium', explanation: 'Homoglyph "1" mimics "l", masked URL hides phishing site. PayPal uses paypal.com.' },
+          { text: 'An SMS arrives on your phone. Is it safe?', smsContent: { from: '+639123456789', body: 'Your BDO card is locked. Reply YES or visit https://bdo-on1ine.com/unlock', maskedUrl: 'https://bdo-bank.online' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', difficulty: 'Medium', explanation: 'Homoglyph "1" mimics "l", link shim hides real URL. BDO uses bdo.com.ph.' },
+          { text: 'A Gmail email appears. Is it trustworthy?', emailContent: { from: 'no-reply@amazon-dea1s2025.com', subject: 'Order Confirmation #XYZ123', body: 'Your Amazon order is confirmed. Track here: https://amazon-dea1s2025.com/track', maskedUrl: 'https://amazon.order-tracking.org' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', difficulty: 'Highly Technical', explanation: 'Homoglyph "1" replaces "l", masked URL mimics Amazon. Verify on amazon.com.' },
+          { text: 'You get an SMS. What is it?', smsContent: { from: 'GCash Support', body: 'Low balance alert. Top up at https://gcash-support.net/topup', maskedUrl: 'https://secure.gcash-login.net' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', difficulty: 'Medium', explanation: 'Link shim and fake domain. GCash uses gcash.com.' },
+          { text: 'A Gmail email arrives. Is it safe?', emailContent: { from: 'promo@shopee-prom0.com', subject: 'Win P5000!', body: 'Claim your prize: https://bit.ly/sh0pee-promo', maskedUrl: 'https://shopee-promotions.ph' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', difficulty: 'Highly Technical', explanation: 'Homoglyph "0" mimics "o", shortened URL with mask. Shopee uses shopee.ph.' },
+          { text: 'An SMS appears. Is it legitimate?', smsContent: { from: 'DHL Tracking', body: 'Your package is delayed. Track at https://dhl-tracking.org/status', maskedUrl: 'https://dhl-delivery-service.com' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', difficulty: 'Medium', explanation: 'URL masking hides phishing site. DHL uses dhl.com.' },
+          { text: 'You receive a Gmail email. What is it?', emailContent: { from: 'tax@irs.gov.ph', subject: 'Tax Payment Due', body: 'Pay $2000 by May 20, 2025. Click: https://irs-payment.gov.ph/pay', maskedUrl: 'https://secure-tax.us.gov' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', difficulty: 'Highly Technical', explanation: 'Fake ".gov.ph", masked URL mimics IRS. Verify via irs.gov.' },
+          { text: 'An SMS arrives. Is it safe?', smsContent: { from: '+12025550123', body: 'Netflix billing issue. Update at https://netf1ix.com/bill', maskedUrl: 'https://netflix-billing.support' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', difficulty: 'Highly Technical', explanation: 'Homoglyph "1" mimics "l", masked URL. Netflix uses netflix.com.' },
+          { text: 'A Gmail email appears. Is it trustworthy?', emailContent: { from: 'support@gmaìl.com', subject: 'Account Security Alert', body: 'Your account is at risk. Verify: https://gmaìl.com/security', maskedUrl: 'https://accounts.google-login.com' }, options: ['Legitimate', 'Phishing'], correctAnswer: 'Phishing', difficulty: 'Extremely Highly Technical', explanation: 'Homoglyph "ì" mimics "i", masked URL mimics Google. Use accounts.google.com.' },
+          { text: 'You get an SMS. What is it?', smsContent: { from: 'Globe PH', body: 'Your load expires. Recharge at https://gl0be.com.ph/recharge', maskedUrl: 'https://globe-mobile.topup' }, options: ['Legitimate', 'Smishing'], correctAnswer: 'Smishing', difficulty: 'Highly Technical', explanation: 'Homoglyph "0" mimics "o", masked URL. Globe uses globe.com.ph.' }
         ],
         netsec: [
           { text: 'You’re setting up a home router. Port 80 is open. What should you do?', options: ['Leave it', 'Close it if unused', 'Change it'], correctAnswer: 'Close it if unused', difficulty: 'Medium', explanation: 'Port 80 (HTTP) can be exploited. Close it if not needed to reduce risks.' },
