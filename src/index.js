@@ -72,7 +72,7 @@ try {
 
     function ErrorBoundary(props) {
       const [hasError, setHasError] = useState(false);
-      const [error, setError] = setError(null);
+      const [error, setError] = useState(null);
 
       useEffect(function() {
         window.addEventListener('error', function(e) {
